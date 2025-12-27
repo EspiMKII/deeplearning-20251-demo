@@ -22,7 +22,9 @@
 
     <!-- hidden until selected -->
     <div id="modeInpainting" hidden>
-        <p class="inpaintingText">Pick the coordinates for the mask:</p>
+        <div class="inpaintingText">
+          <p>Pick the coordinates for the mask:</p>
+        </div>
 
         <!-- wrapper so canvas can overlay the image cleanly -->
         <div class="imageWrapper" style="display:inline-block; position:relative;">
@@ -30,7 +32,7 @@
         </div>
 
         <form id="inpaintingForm" method="post">
-            <input type="hidden" name="modeChoice" value="inpainting">
+            <input type="hidden" name="form_id" value="inpainting">
 
             <label class="inpaintingText" for="topX">Top-left horizontal coordinate:</label>
             <input name="topX" id="topX" type="number" min="0" step="1" required>

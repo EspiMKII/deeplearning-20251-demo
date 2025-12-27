@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='inpainting.css')}}">
 {% endblock %}
 
 {% block title %}
@@ -9,5 +9,30 @@
 {% endblock %}
 
 {% block content %}
-    <img href="{{ img_url }}" alt="image">
+    <div class="resultsText">
+        <p id="resultsText">Results</p>
+    </div>
+
+    <div class="images">
+        <div class="original">
+            <button type="button" class="original">Original</button>
+            <img class="original" id="original" src="{{ url_for('assets', filename='original.jpg') }}" alt="original">
+        </div>
+        <div class="masked">
+            <button type="button" class="masked">Masked</button>
+            <img class="masked" id="masked" src="{{ url_for("assets", filename="masked.jpg") }}" alt="masked">
+        </div>
+        <div class="output">
+            <button type="button" class="output">Output</button>
+            <img class="output" id="output" src="{{ url_for("assets", filename="output.jpg")}}" alt="output">
+        </div>
+    </div>
+
+    <div class="again">
+      <form id="again" method="post">
+        <input type="hidden" name="form_id" value="again">
+        <button type="submit">Again?</button>
+      </form>
+    </div>
+
 {% endblock %}

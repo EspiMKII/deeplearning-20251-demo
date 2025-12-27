@@ -14,9 +14,19 @@
 
   <body>
     <div class="navbar">
-      <button class="demo">{%block demo %}{% endblock %}</button>
-      <button class="about">About</button>
-      <button class="projname">Group 9 Demonstration</button>
+      <form class="demo" id="demo" method="post">
+        <input type="hidden" name="form_id" value="demo">
+        <button class="demo" type="submit">{%block demo %}{% endblock %}</button>
+      </form>
+
+      <form class="about" id="about" method="post">
+        <input type="hidden" name="form_id" value="about">
+        <button class="about" type="submit">About</button>
+      </form>
+
+      <div class="projname">
+        <button type="button" class="projname">Group 9 Demonstration</button>
+      </div>
     </div>
 
     <div class="content">

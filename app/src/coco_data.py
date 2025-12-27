@@ -32,6 +32,11 @@ def getRandomUrl(urllist=None):
     return choice(urllist)
 
 if __name__ == "__main__":
-    from images import getImage
-    img = getImage(getRandomUrl())
+    from images import getImageFromUrl, cropRemainder, saveImage
+    img = getImageFromUrl(getRandomUrl())
+    saveImage("img", img)
     img.show()
+
+    cropped = cropRemainder(img, 100, 100, 100, 100)
+    saveImage("cropped", cropped)
+    cropped.show()

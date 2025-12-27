@@ -43,18 +43,41 @@
     background-color: royalblue;
 
     margin-top: 30px;
-    /*height: 700px;*/
-    width: 1400px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    width: 95%;
+    height: auto;
+
+    display: grid;
+    grid-template-columns: 10% 65%;
+    padding: 15px;
 
     border-radius: 20px;
 }
 .inpaintingText {
     color: white;
+    grid-column-start: 1;
+
+    display: flex;
+    align-items: center;
+}
+.imageWrapper {
+    grid-column-start: 2;
+}
+#baseImageInpainting {
+    width: 100%;
+}
+
+#inpaintingForm {
+    grid-column-start: 3;
+
+    display: grid flex;
+    grid-template-rows: 100%;
+    flex-direction: column;
+
+    align-content: center;
+}
+.run {
+    margin-top: 10px;
+    font-family: Mulish;
 }
 
 /* Ensure canvas overlay sits exactly over the image and is hidden when parent is hidden */
