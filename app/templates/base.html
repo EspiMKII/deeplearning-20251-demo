@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="{{url_for("static", )}}">
-    <title>{% block title %}{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=BBH+Hegarty&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+    {% block head %}{% endblock %}
+    <title>{% block title %}{% endblock %} | Demo</title>
   </head>
 
   <body>
     <div class="navbar">
       <button class="demo">{%block demo %}{% endblock %}</button>
-      <button class="about">{% block about %}{% endblock %}</button>
+      <button class="about">About</button>
+      <button class="projname">Group 9 Demonstration</button>
     </div>
 
     <div class="content">
@@ -16,3 +24,4 @@
     </div>
   </body>
 </html>
+

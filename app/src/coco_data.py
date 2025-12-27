@@ -31,12 +31,7 @@ def getRandomUrl(urllist=None):
     if urllist == None: urllist = openUrlList()
     return choice(urllist)
 
-def getImage(url=None):
-    if url == None: url = getRandomUrl()
-    from PIL import Image
-    from urllib.request import urlopen
-    return Image.open(urlopen(url))
-
 if __name__ == "__main__":
-    img = getImage()
+    from images import getImage
+    img = getImage(getRandomUrl())
     img.show()

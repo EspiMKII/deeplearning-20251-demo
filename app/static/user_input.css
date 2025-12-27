@@ -1,0 +1,78 @@
+.segInpaintTemp {
+    color: red;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 250px;
+}
+
+#modeForm {
+    grid-column-start: 1;
+    margin-top: 50px;
+}
+#modeBg {
+    border: none;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    height: 55px;
+    width: 210px;
+    background-color: royalblue;
+}
+#modeChoice,
+#modeChoiceLabel {
+    font-family: Mulish;
+    font-weight: bold;
+}
+#modeChoiceLabel {
+    margin-left: -14px;
+    color: white;
+}
+#modeChoice {
+    margin-left: -15px;
+}
+
+#modeInpainting,
+#modeSegInpaint {
+    grid-column-start: 2;
+}
+
+#modeInpainting {
+    text-align: center;
+    font-family: Mulish;
+    background-color: royalblue;
+
+    margin-top: 30px;
+    /*height: 700px;*/
+    width: 1400px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 20px;
+}
+.inpaintingText {
+    color: white;
+}
+
+/* Ensure canvas overlay sits exactly over the image and is hidden when parent is hidden */
+.imageWrapper {
+    display: inline-block;
+    position: relative;
+}
+
+#overlayCanvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    /* pointer-events none so clicks go through to underlying controls if necessary */
+    pointer-events: none;
+}
+
+/* hide panels when `hidden` attribute is present (for older browsers) */
+#modeInpainting[hidden],
+#modeSegInpaint[hidden] {
+    display: none;
+}

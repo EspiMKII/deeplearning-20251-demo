@@ -1,3 +1,37 @@
+body {
+    margin: 0 0 0 0;
+    font-family: Arial;
+}
+
 .navbar {
-    margin-top: 8px;
+    height: 50px;
+    background-color: royalblue;
+    padding-left: 40px;
+
+    .demo,
+    .about,
+    .projname {
+        font-family: BBH Hegarty;
+        color: white;
+        background: none;
+        border: none;
+    }
+
+    .demo,
+    .about {
+        margin-top: 14px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .about {
+        margin-left: 20px;
+    }
+
+    .projname {
+        font-size: 22px;
+        float: right;
+        margin-right: 10px;
+        margin-top: 10px;
+    }
 }
