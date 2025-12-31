@@ -1,2 +1,9 @@
 .venv/
 ignored/
+
+app/assets/lightning_logs/
+app/assets/masked.jpg
+app/assets/original.jpg
+app/assets/output.jpg
+
+app/src/__pycache__/
