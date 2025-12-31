@@ -1,11 +1,10 @@
 from flask import Blueprint, render_template, session, request
 from images import cropRemainder, saveImage, getImageFromUrl
 from form_id_handler import formIdHandler
-from COCO_lama import run_inference_from_image
+from COCO_lama import run_inference_from_image, tensor2PILImage
 import os
 
 from torch import zeros
-from torchvision import transforms
 
 inpainting_bp = Blueprint('inpainting', __name__, url_prefix='/inpainting')
 
@@ -26,29 +25,33 @@ def inpainting():
         img_url = session["img_url"]
         print(f"retrieved url from session: {img_url}")
         img = getImageFromUrl(img_url)
-
-        # this is only used for display; the actual mask will be a different object
-        cropped = cropRemainder(img, topX, topY, width, height)
-
+        oldwidth, oldheight = img.width, img.height
         img = img.resize((128, 128))
         saveImage("original", img)
 
-        cropped = cropped.resize((128,128))
+        # rescaling as we just resized the image
+        topX = topX * 128 // oldwidth
+        topY = topY * 128 // oldheight
+        width = width * 128 // oldwidth
+        height = height * 128 // oldheight
+
+        # this is only used for display; the actual mask will be a different object
+        cropped = cropRemainder(img, topX, topY, width, height)
         saveImage("masked", cropped)
 
         # actual mask
         mask = zeros(9, img.height, img.width)
         bottomX, bottomY = topX + width, topY + height
-        mask[:, topX:bottomX, topY:bottomY] = 1
+        mask[:, topY:bottomY, topX:bottomX] = 1
 
         srcpath = os.path.dirname(__file__)
         apppath = os.path.dirname(srcpath)
         assetspath = os.path.join(apppath, 'assets')
         ckpt_path = os.path.join(assetspath, "lightning_logs", "model.ckpt")
 
-        maskedTrash, result, originalTrash = run_inference_from_image(img, mask, ckpt_path)
-        # transform = transforms.ToPILImage()
-        # result = transform(result.squeeze(0).cpu().detach())
+        maskedTrash, result, originalTrash = run_inference_from_image(image=img, mask=mask, ckpt_path=ckpt_path)
+
+        result = tensor2PILImage(result)
 
         saveImage("output", result)
     else: # POST

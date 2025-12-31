@@ -472,7 +472,7 @@ class FFCResNetGenerator(nn.Module):
         model += [nn.ReflectionPad2d(3),
                   nn.Conv2d(ngf, output_nc, kernel_size=7, padding=0)]
 
-        model.append(nn.Sigmoid())
+        # model.append(nn.Sigmoid())
 
         self.model = nn.Sequential(*model)
 
@@ -1247,7 +1247,7 @@ trainer = pl.Trainer(
 
 # run_inference_from_folder(image_folder_path="images/test")
 
-def run_inference_from_image(image, mask, ckpt_path="model.ckpt", device='cpu'):
+def run_inference_from_image(image, mask, ckpt_path="model.ckpt", device='cpu', showimage=False):
     """
     Suitable for implementation.
     image: can be a path to img, `torch.Tensor` of `np.ndarray`
@@ -1289,7 +1289,7 @@ def run_inference_from_image(image, mask, ckpt_path="model.ckpt", device='cpu'):
     mask = cvt2Tensor(mask, c=1)
 
     masked_image = image * (1 - mask)
-    mask = 1 - mask
+    # mask = 1 - mask
 
     res = model({
         "image": image,
@@ -1299,9 +1299,22 @@ def run_inference_from_image(image, mask, ckpt_path="model.ckpt", device='cpu'):
 
     print(f"Running inference completed in {time.time() - start_time:.5f}s")
 
-    show_images(masked_image, inpainted_image, image, n=1)
+    if showimage:
+        show_images(masked_image, inpainted_image, image, n=1)
 
     return masked_image, inpainted_image, image
+
+def tensor2PILImage(inpainted_image: torch.Tensor):
+    '''
+    converts the result from run_inference_from_image() to a PIL.Image() instance
+
+    Parameters:
+        tensor (torch.Tensor): 4 dimensional
+    '''
+    inpainted_3d = inpainted_image.squeeze(0)
+    result = transforms.ToPILImage()(inpainted_3d)
+    return result
+
 
 if __name__ == "__main__":
     from images import getImageFromUrl
@@ -1321,7 +1334,7 @@ if __name__ == "__main__":
     print("Creating mask:")
     start_time = time.time()
     mask_dummy = torch.zeros(9, img.height, img.width)
-    mask_size = 16 # /shrug
+    mask_size = 32 # /shrug
     center_x, center_y = img.width // 2, img.height // 2
     start_x, end_x = center_x - mask_size // 2, center_x + mask_size // 2
     start_y, end_y = center_y - mask_size // 2, center_y + mask_size // 2
