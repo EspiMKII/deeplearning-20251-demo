@@ -49,6 +49,10 @@ import shutil
 import matplotlib.pyplot as plt
 from IPython import display
 
+from images import getImageFromUrl
+from coco_data import getRandomUrl
+
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 image_folder='/content/images/images'
 
@@ -1300,10 +1304,10 @@ if __name__ == "__main__":
     srcpath = os.path.dirname(__file__)
     apppath = os.path.dirname(srcpath)
     assetspath = os.path.join(apppath, 'assets')
-
     ckpt_path = os.path.join(assetspath, "lightning_logs", "model.ckpt")
-    img_path = os.path.join(assetspath, "original.jpg")
-    img = Image.open(img_path)
+
+    img = getImageFromUrl(getRandomUrl())
+    # while img.width != img.height: img = getImageFromUrl(getRandomUrl())
 
     mask_dummy = torch.zeros(9, img.height, img.width)
     mask_size = 100 # /shrug
@@ -1312,4 +1316,4 @@ if __name__ == "__main__":
     start_y, end_y = center_y - mask_size // 2, center_y + mask_size // 2
     mask_dummy[:, start_y:end_y, start_x:end_x] = 1
 
-    run_inference_from_image(image=img_path, mask=mask_dummy, ckpt_path=ckpt_path)
+    run_inference_from_image(image=img, mask=mask_dummy, ckpt_path=ckpt_path)
