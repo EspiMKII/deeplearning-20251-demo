@@ -49,8 +49,7 @@ import shutil
 import matplotlib.pyplot as plt
 from IPython import display
 
-from images import getImageFromUrl
-from coco_data import getRandomUrl
+import time
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -1253,6 +1252,8 @@ def run_inference_from_image(image, mask, ckpt_path="model.ckpt", device='cpu'):
     Suitable for implementation.
     image: can be a path to img, `torch.Tensor` of `np.ndarray`
     """
+    print("Running inference")
+    start_time = time.time()
 
     def cvt2Tensor(img, c=3):
         """
@@ -1288,7 +1289,7 @@ def run_inference_from_image(image, mask, ckpt_path="model.ckpt", device='cpu'):
     mask = cvt2Tensor(mask, c=1)
 
     masked_image = image * (1 - mask)
-    # mask = 1 - mask
+    mask = 1 - mask
 
     res = model({
         "image": image,
@@ -1296,24 +1297,35 @@ def run_inference_from_image(image, mask, ckpt_path="model.ckpt", device='cpu'):
     })
     inpainted_image = res['inpainted']
 
+    print(f"Running inference completed in {time.time() - start_time:.5f}s")
+
     show_images(masked_image, inpainted_image, image, n=1)
 
     return masked_image, inpainted_image, image
 
 if __name__ == "__main__":
+    from images import getImageFromUrl
+    from coco_data import getRandomUrl
+
     srcpath = os.path.dirname(__file__)
     apppath = os.path.dirname(srcpath)
     assetspath = os.path.join(apppath, 'assets')
     ckpt_path = os.path.join(assetspath, "lightning_logs", "model.ckpt")
 
-    img = getImageFromUrl(getRandomUrl())
-    # while img.width != img.height: img = getImageFromUrl(getRandomUrl())
+    print("Rolling the dice for a good image:")
+    start_time = time.time()
+    img = getImageFromUrl(getRandomUrl(samesize=True))
+    img = img.resize((128, 128))
+    print(f"Rolling complete in {time.time() - start_time:.5f}s; image size: {img.width}, {img.height}")
 
+    print("Creating mask:")
+    start_time = time.time()
     mask_dummy = torch.zeros(9, img.height, img.width)
-    mask_size = 100 # /shrug
+    mask_size = 16 # /shrug
     center_x, center_y = img.width // 2, img.height // 2
     start_x, end_x = center_x - mask_size // 2, center_x + mask_size // 2
     start_y, end_y = center_y - mask_size // 2, center_y + mask_size // 2
     mask_dummy[:, start_y:end_y, start_x:end_x] = 1
+    print(f"Created mask in {time.time() - start_time:.5f}s; mask size: {mask_size}, top left coords:() {start_x},{start_y})")
 
     run_inference_from_image(image=img, mask=mask_dummy, ckpt_path=ckpt_path)

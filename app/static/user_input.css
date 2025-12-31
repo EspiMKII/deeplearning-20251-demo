@@ -35,9 +35,7 @@
 #modeInpainting,
 #modeSegInpaint {
     grid-column-start: 2;
-}
 
-#modeInpainting {
     text-align: center;
     font-family: Mulish;
     background-color: royalblue;
@@ -46,11 +44,13 @@
     width: 95%;
     height: auto;
 
+    border-radius: 20px;
+}
+
+#modeInpainting {
     display: grid;
     grid-template-columns: 10% 65%;
     padding: 15px;
-
-    border-radius: 20px;
 }
 .inpaintingText {
     color: white;

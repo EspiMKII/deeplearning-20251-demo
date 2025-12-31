@@ -22,8 +22,8 @@ def input():
             else: #segmentation + inpainting
                 pass
 
-    url = getRandomUrl()
-    print(url)
+    url = getRandomUrl(samesize=True)
+    print(f"Fetching image from {url}")
     session.clear()
     session["img_url"] = url
 
