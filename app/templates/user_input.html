@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Input something...{% endblock %}
+{% block demo %}Input{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='user_input.css') }}">
+{% endblock %}
+
+{% block content %}
+    <form id="modeForm" method="post">
+        <button id="modeBg" type="button">
+          <label id="modeChoiceLabel" for="modeChoice">Select how to run the model:</label>
+          <br>
+          <select id="modeChoice" required>
+              <option value="none">--choose--</option>
+              <option value="inpainting">Inpainting</option>
+              <option class="segInpaintTemp" value="seg_inpaint">NOT YET IMPLEMENTED</option>
+          </select>
+        </button>
+    </form>
+
+    <!-- hidden until selected -->
+    <div id="modeInpainting" hidden>
+        <div class="inpaintingText">
+          <p>Pick the coordinates for the mask:</p>
+        </div>
+
+        <!-- wrapper so canvas can overlay the image cleanly -->
+        <div class="imageWrapper" style="display:inline-block; position:relative;">
+            <img class="baseImage" id="baseImageInpainting" src="{{url}}" alt="base image"/>
+        </div>
+
+        <form id="inpaintingForm" method="post">
+            <input type="hidden" name="form_id" value="inpainting">
+
+            <label class="inpaintingText" for="topX">Top-left horizontal coordinate:</label>
+            <input name="topX" id="topX" type="number" min="0" step="1" required>
+            <br>
+
+            <label class="inpaintingText" for="topY">Top-left vertical coordinate:</label>
+            <input name="topY" id="topY" type="number" min="0" step="1" required>
+            <br>
+
+            <label class="inpaintingText" for="width">Width:</label>
+            <input name="width" id="width" type="number" min="0" step="1" required>
+            <br>
+
+            <label class="inpaintingText" for="height">Height:</label>
+            <input name="height" id="height" type="number" min="0" step="1" required>
+            <br>
+
+            <button type="submit" class="run">Run the model</button>
+        </form>
+
+
+    </div>
+
+    <!-- hidden until selected -->
+    <div id="modeSegInpaint" class="modeSegInpaint">
+        Segmentation + Inpainting mode
+    </div>
+
+    {#hides unused operation modes as necessary#}
+    <script>
+        (function() {
+          /* Hides or shows the operation modes as necessary */
+          const select = document.getElementById('modeChoice');
+          const panelInpaint = document.getElementById('modeInpainting');
+          const panelSeg = document.getElementById('modeSegInpaint');
+
+          function updatePanels(value) {
+            if (value === 'inpainting') {
+              panelInpaint.hidden = false;
+              panelInpaint.setAttribute('aria-hidden', 'false');
+              panelSeg.hidden = true;
+              panelSeg.setAttribute('aria-hidden', 'true');
+            } else if (value === 'seg_inpaint') {
+              panelInpaint.hidden = true;
+              panelInpaint.setAttribute('aria-hidden', 'true');
+              panelSeg.hidden = false;
+              panelSeg.setAttribute('aria-hidden', 'false');
+            } else {
+              // none selected
+              panelInpaint.hidden = true;
+              panelInpaint.setAttribute('aria-hidden', 'true');
+              panelSeg.hidden = true;
+              panelSeg.setAttribute('aria-hidden', 'true');
+            }
+          }
+
+        if (select) {
+          // initialize on page load
+          updatePanels(select.value);
+
+          // update on change
+          select.addEventListener('change', (e) => updatePanels(e.target.value));
+        }
+
+        /* Canvas overlay & Mask drawing for inpainting */
+        const img = document.getElementById('baseImageInpainting');
+        if (!img) return; // bail if image missing
+
+        // Build an overlay canvas inside the same wrapper as the image
+        const wrapper = img.parentElement;
+        wrapper.style.position = wrapper.style.position || 'relative';
+        const canvas = document.createElement('canvas');
+        canvas.id = 'overlayCanvas';
+        canvas.style.position = 'absolute';
+        canvas.style.left = '0';
+        canvas.style.top = '0';
+        canvas.style.pointerEvents = 'none'; // so user can click inputs underneath
+        wrapper.appendChild(canvas);
+
+        // Get references to inputs
+        const inputX = document.getElementById('topX');
+        const inputY = document.getElementById('topY');
+        const inputW = document.getElementById('width');
+        const inputH = document.getElementById('height');
+
+        // Resize the canvas to match the displayed image size
+        function resizeCanvasToImage() {
+          // Use the displayed size so the user-entered coords map to displayed pixels
+          const displayW = img.clientWidth;
+          const displayH = img.clientHeight;
+
+          // Set canvas drawing buffer and CSS size to match displayed image
+          canvas.width = displayW;
+          canvas.height = displayH;
+          canvas.style.width = displayW + 'px';
+          canvas.style.height = displayH + 'px';
+
+          // Redraw after resize
+          drawMask();
+        }
+
+        // Draw the mask rectangle based on current input values
+        function drawMask() {
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Parse numbers; if invalid, do nothing
+          const x = Number(inputX.value);
+          const y = Number(inputY.value);
+          const w = Number(inputW.value);
+          const h = Number(inputH.value);
+
+          if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(w) || !Number.isFinite(h)) {
+            return;
+          }
+
+          // convert to integers
+          const xi = Math.max(0, Math.floor(x));
+          const yi = Math.max(0, Math.floor(y));
+          let wi = Math.max(0, Math.floor(w));
+          let hi = Math.max(0, Math.floor(h));
+
+          // clamp to canvas bounds
+          if (xi >= canvas.width || yi >= canvas.height) return; // fully outside
+          if (xi + wi > canvas.width) wi = canvas.width - xi;
+          if (yi + hi > canvas.height) hi = canvas.height - yi;
+          if (wi <= 0 || hi <= 0) return;
+
+          // draw
+          ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+          ctx.fillRect(xi, yi, wi, hi);
+        }
+
+        // Initialize when image loads (and if already loaded)
+        function init() {
+          resizeCanvasToImage();
+
+          // redraw when user types
+          [inputX, inputY, inputW, inputH].forEach(el => {
+            if (!el) return;
+            el.addEventListener('input', () => {
+              // basic client-side validation: keep numbers non-negative integers
+              if (el.value === '') return drawMask();
+              // coerce to integer in the input display (optional)
+              const n = Math.floor(Number(el.value));
+              if (!Number.isFinite(n)) return;
+              // don't overwrite while user types — only clamp visually here
+              drawMask();
+            });
+          });
+
+          // keep canvas aligned on window resize (or if image layout changes)
+          window.addEventListener('resize', resizeCanvasToImage);
+        }
+
+        if (img.complete && img.naturalWidth !== 0) {
+          // image already loaded
+          init();
+        } else {
+          img.addEventListener('load', init);
+        }
+
+        })();
+    </script>
+
+{% endblock %}

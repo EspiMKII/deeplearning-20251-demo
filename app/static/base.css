@@ -1,0 +1,44 @@
+body {
+    margin: 0 0 0 0;
+    font-family: Arial;
+}
+
+.navbar {
+    height: 50px;
+    background-color: royalblue;
+    padding-left: 20px;
+
+    display: grid;
+    grid-template-columns: 0% 6% 10%;
+    #demo {
+        grid-column-start: 2;
+    }
+    #about {
+        grid-column-start: 3;
+    }
+    .projname {
+        grid-column-start: 4;
+    }
+
+    .demo,
+    .about,
+    .projname {
+        font-family: BBH Hegarty;
+        color: white;
+        background: none;
+        border: none;
+        display: grid;
+        align-items: center;
+    }
+
+    .demo,
+    .about {
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .projname {
+        font-size: 22px;
+        justify-items: right;
+    }
+}

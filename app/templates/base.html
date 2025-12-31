@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=BBH+Hegarty&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+    {% block head %}{% endblock %}
+    <title>{% block title %}{% endblock %} | Demo</title>
+  </head>
+
+  <body>
+    <div class="navbar">
+      <form class="demo" id="demo" method="post">
+        <input type="hidden" name="form_id" value="demo">
+        <button class="demo" type="submit">{%block demo %}{% endblock %}</button>
+      </form>
+
+      <form class="about" id="about" method="post">
+        <input type="hidden" name="form_id" value="about">
+        <button class="about" type="submit">About</button>
+      </form>
+
+      <div class="projname">
+        <button type="button" class="projname">Group 9 Demonstration</button>
+      </div>
+    </div>
+
+    <div class="content">
+      {%block content%}{% endblock %}
+    </div>
+  </body>
+</html>
+
