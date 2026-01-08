@@ -48,7 +48,9 @@ def inpainting():
         srcpath = os.path.dirname(__file__)
         apppath = os.path.dirname(srcpath)
         assetspath = os.path.join(apppath, 'assets')
-        ckpt_path = os.path.join(assetspath, "lightning_logs", "model.ckpt")
+        lightning_logs_path = os.path.join(assetspath, "lightning_logs")
+        ckpt_files = [f for f in os.listdir(lightning_logs_path) if f.endswith('.ckpt')]
+        ckpt_path = os.path.join(lightning_logs_path, ckpt_files[0])
 
         maskedTrash, result, originalTrash = run_inference_from_image(image=img, mask=mask, ckpt_path=ckpt_path)
 

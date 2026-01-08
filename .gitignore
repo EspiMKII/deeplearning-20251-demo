@@ -5,6 +5,7 @@ app/assets/lightning_logs/
 app/assets/masked.jpg
 app/assets/original.jpg
 app/assets/output.jpg
+app/assets/seg_result.jpg
 app/assets/seg_models/
 
 app/src/__pycache__/
