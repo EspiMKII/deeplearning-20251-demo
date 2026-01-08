@@ -1,7 +1,3 @@
-.segInpaintTemp {
-    color: red;
-}
-
 .content {
     display: grid;
     grid-template-columns: 250px;
@@ -33,7 +29,7 @@
 }
 
 #modeInpainting,
-#modeSegInpaint {
+#modeSeg {
     grid-column-start: 2;
 
     text-align: center;
@@ -49,32 +45,77 @@
 
 #modeInpainting {
     display: grid;
-    grid-template-columns: 10% 65%;
+    grid-template-columns: 20% 60%;
     padding: 15px;
 }
 .inpaintingText {
     color: white;
     grid-column-start: 1;
+    font-family: Mulish 20px;
+    font-weight: bold;
 
     display: flex;
     align-items: center;
 }
 .imageWrapper {
     grid-column-start: 2;
+    text-align: center;
 }
 #baseImageInpainting {
-    width: 100%;
+    /*width: 100%;
+    height: auto;*/
 }
-
 #inpaintingForm {
     grid-column-start: 3;
 
-    display: grid flex;
-    grid-template-rows: 100%;
+    display: flex;
     flex-direction: column;
 
     align-content: center;
+    justify-content: center;
 }
+
+#modeSeg {
+    display: grid;
+    grid-template-columns: 20% 60%;
+    padding: 15px;
+}
+.segText {
+    color: white;
+    grid-column-start: 1;
+    font-family: Mulish 20px;
+    font-weight: bold;
+
+    display: flex;
+    align-items: center;
+}
+.imageWrapper {
+    grid-column-start: 2;
+    text-align: center;
+}
+#baseImageSeg {
+    /*width: 100%;
+    height: auto;*/
+}
+#segForm {
+    grid-column-start: 3;
+
+    display: flex;
+    flex-direction: column;
+
+    align-content: center;
+    justify-content: center;
+}
+#segModelTypeLabel {
+    color: white;
+    font-family: Mulish 20px;
+    font-weight: bold;
+}
+#segModelType {
+    font-family: Mulish 20px;
+    font-weight: bold;
+}
+
 .run {
     margin-top: 10px;
     font-family: Mulish;
@@ -90,12 +131,11 @@
     position: absolute;
     left: 0;
     top: 0;
-    /* pointer-events none so clicks go through to underlying controls if necessary */
+
     pointer-events: none;
 }
 
-/* hide panels when `hidden` attribute is present (for older browsers) */
 #modeInpainting[hidden],
-#modeSegInpaint[hidden] {
+#modeSeg[hidden] {
     display: none;
 }

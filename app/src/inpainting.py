@@ -22,18 +22,19 @@ def inpainting():
         #     session.clear()
         #     topX, topY, width, height = 100, 100, 100, 100
 
+        NEWSIZE = 128
+
         img_url = session["img_url"]
-        print(f"retrieved url from session: {img_url}")
         img = getImageFromUrl(img_url)
         oldwidth, oldheight = img.width, img.height
-        img = img.resize((128, 128))
+        img = img.resize((NEWSIZE, NEWSIZE))
         saveImage("original", img)
 
         # rescaling as we just resized the image
-        topX = topX * 128 // oldwidth
-        topY = topY * 128 // oldheight
-        width = width * 128 // oldwidth
-        height = height * 128 // oldheight
+        topX = topX * NEWSIZE // oldwidth
+        topY = topY * NEWSIZE // oldheight
+        width = width * NEWSIZE // oldwidth
+        height = height * NEWSIZE // oldheight
 
         # this is only used for display; the actual mask will be a different object
         cropped = cropRemainder(img, topX, topY, width, height)
@@ -52,7 +53,6 @@ def inpainting():
         maskedTrash, result, originalTrash = run_inference_from_image(image=img, mask=mask, ckpt_path=ckpt_path)
 
         result = tensor2PILImage(result)
-
         saveImage("output", result)
     else: # POST
         form_id = request.form.get("form_id")

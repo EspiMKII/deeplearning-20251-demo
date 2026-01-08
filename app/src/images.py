@@ -52,15 +52,14 @@ def saveImage(
     targetname: str,
     img: Image.Image,
 ):
-    # since this function is just used in this fixer-upper project, I kinda don't care that we're
-    # hard-coding in a path like this lol
     srcpath = os.path.dirname(__file__)
     apppath = os.path.dirname(srcpath)
     assetspath = os.path.join(apppath, "assets")
     targetfile = targetname + ".jpg" # /shrug
     targetdir = os.path.join(assetspath, targetfile)
 
-    if os.path.exists(targetdir): os.remove(targetdir)
+    if os.path.exists(targetdir):
+        os.remove(targetdir)
     img.save(targetdir)
 
     return

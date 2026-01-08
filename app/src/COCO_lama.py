@@ -1328,17 +1328,17 @@ if __name__ == "__main__":
     print("Rolling the dice for a good image:")
     start_time = time.time()
     img = getImageFromUrl(getRandomUrl(samesize=True))
-    img = img.resize((128, 128))
+    # img = img.resize((128, 128))
     print(f"Rolling complete in {time.time() - start_time:.5f}s; image size: {img.width}, {img.height}")
 
     print("Creating mask:")
     start_time = time.time()
     mask_dummy = torch.zeros(9, img.height, img.width)
-    mask_size = 32 # /shrug
+    mask_size = 256 # /shrug
     center_x, center_y = img.width // 2, img.height // 2
     start_x, end_x = center_x - mask_size // 2, center_x + mask_size // 2
     start_y, end_y = center_y - mask_size // 2, center_y + mask_size // 2
     mask_dummy[:, start_y:end_y, start_x:end_x] = 1
     print(f"Created mask in {time.time() - start_time:.5f}s; mask size: {mask_size}, top left coords:() {start_x},{start_y})")
 
-    run_inference_from_image(image=img, mask=mask_dummy, ckpt_path=ckpt_path)
+    run_inference_from_image(image=img, mask=mask_dummy, ckpt_path=ckpt_path, showimage=True)
