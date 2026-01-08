@@ -15,7 +15,7 @@
           <select id="modeChoice" required>
               <option value="none">--choose--</option>
               <option value="inpainting">Inpainting</option>
-              <option class="segInpaintTemp" value="seg_inpaint">NOT YET IMPLEMENTED</option>
+              <option value="seg">Segmentation</option>
           </select>
         </button>
     </form>
@@ -23,12 +23,12 @@
     <!-- hidden until selected -->
     <div id="modeInpainting" hidden>
         <div class="inpaintingText">
-          <p>Pick the coordinates for the mask:</p>
+          <p class="inpaintingText">Pick the coordinates for the mask:</p>
         </div>
 
         <!-- wrapper so canvas can overlay the image cleanly -->
         <div class="imageWrapper" style="display:inline-block; position:relative;">
-            <img class="baseImage" id="baseImageInpainting" src="{{url}}" alt="base image"/>
+            <img id="baseImageInpainting" src="{{url}}" alt="base image"/>
         </div>
 
         <form id="inpaintingForm" method="post">
@@ -57,8 +57,33 @@
     </div>
 
     <!-- hidden until selected -->
-    <div id="modeSegInpaint" class="modeSegInpaint">
-        Segmentation + Inpainting mode
+    <div id="modeSeg" class="modeSeg">
+
+        <div class="segText">
+        <p>Use your mouse to draw a highlight over the image.</p>
+        </div>
+
+        <div class="imageWrapper" style="display:inline-block; position:relative;">
+            <img id="baseImageSeg" src="{{url}}" alt ="base image" />
+        </div>
+
+        <form id="segForm" method="post">
+            <input type="hidden" name="form_id" value="segmentation">
+
+            <input type="hidden" name="topX" id="topX">
+            <input type="hidden" name="topY" id="topY">
+            <input type="hidden" name="width" id="width">
+            <input type="hidden" name="height" id="height">
+
+            <label id="segModelTypeLabel" for="segModelType">Select segmentation model:</label>
+            <br>
+            <select id="segModelType" name="segModelType" required>
+                <option value="fcn16s">fcn16s</option>
+                <option value="unet">unet</option>
+            </select>
+
+            <button type="submit" class="run">Run the model</button>
+        </form>
     </div>
 
     {#hides unused operation modes as necessary#}
@@ -67,7 +92,7 @@
           /* Hides or shows the operation modes as necessary */
           const select = document.getElementById('modeChoice');
           const panelInpaint = document.getElementById('modeInpainting');
-          const panelSeg = document.getElementById('modeSegInpaint');
+          const panelSeg = document.getElementById('modeSeg');
 
           function updatePanels(value) {
             if (value === 'inpainting') {
@@ -75,7 +100,7 @@
               panelInpaint.setAttribute('aria-hidden', 'false');
               panelSeg.hidden = true;
               panelSeg.setAttribute('aria-hidden', 'true');
-            } else if (value === 'seg_inpaint') {
+            } else if (value === 'seg') {
               panelInpaint.hidden = true;
               panelInpaint.setAttribute('aria-hidden', 'true');
               panelSeg.hidden = false;
@@ -99,7 +124,7 @@
 
         /* Canvas overlay & Mask drawing for inpainting */
         const img = document.getElementById('baseImageInpainting');
-        if (!img) return; // bail if image missing
+        if (!img) return;
 
         // Build an overlay canvas inside the same wrapper as the image
         const wrapper = img.parentElement;
@@ -129,6 +154,13 @@
           canvas.height = displayH;
           canvas.style.width = displayW + 'px';
           canvas.style.height = displayH + 'px';
+
+          // Calculate image's actual position within the wrapper
+          const wrapperRect = wrapper.getBoundingClientRect();
+          const imgRect = img.getBoundingClientRect();
+
+          canvas.style.left = (imgRect.left - wrapperRect.left) + 'px';
+          canvas.style.top = (imgRect.top - wrapperRect.top) + 'px';
 
           // Redraw after resize
           drawMask();
@@ -193,6 +225,155 @@
           init();
         } else {
           img.addEventListener('load', init);
+        }
+
+
+        /* Canvas overlay & Object selection for segmentation */
+        const imgSeg = document.getElementById('baseImageSeg');
+        if (!imgSeg) return;
+
+        // Build an overlay canvas inside the same wrapper as the image
+        const wrapperSeg = imgSeg.parentElement;
+        wrapperSeg.style.position = wrapperSeg.style.position || 'relative';
+        const canvasSeg = document.createElement('canvas');
+        canvasSeg.id = 'overlayCanvasSeg';
+        canvasSeg.style.position = 'absolute';
+        canvasSeg.style.left = '0';
+        canvasSeg.style.top = '0';
+        canvasSeg.style.cursor = 'crosshair';
+        wrapperSeg.appendChild(canvasSeg);
+
+        // Get references to hidden inputs in the seg inpaint form
+        const segForm = document.getElementById('segForm');
+        const inputXSeg = segForm.querySelector('#topX');
+        const inputYSeg = segForm.querySelector('#topY');
+        const inputWSeg = segForm.querySelector('#width');
+        const inputHSeg = segForm.querySelector('#height');
+
+        let isDrawing = false;
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
+
+        // Resize the canvas to match the displayed image size
+        function resizeCanvasToImageSeg() {
+          const displayW = imgSeg.clientWidth;
+          const displayH = imgSeg.clientHeight;
+
+          canvasSeg.width = displayW;
+          canvasSeg.height = displayH;
+          canvasSeg.style.width = displayW + 'px';
+          canvasSeg.style.height = displayH + 'px';
+
+          // Calculate image's actual position within the wrapper
+          const wrapperRect = wrapperSeg.getBoundingClientRect();
+          const imgRect = imgSeg.getBoundingClientRect();
+
+          canvasSeg.style.left = (imgRect.left - wrapperRect.left) + 'px';
+          canvasSeg.style.top = (imgRect.top - wrapperRect.top) + 'px';
+
+          drawHighlight();
+        }
+
+        // Draw the highlight rectangle
+        function drawHighlight() {
+          const ctx = canvasSeg.getContext('2d');
+          ctx.clearRect(0, 0, canvasSeg.width, canvasSeg.height);
+
+          if (!isDrawing && (startX === 0 && startY === 0 && currentX === 0 && currentY === 0)) {
+            return;
+          }
+
+          const rectX = Math.min(startX, currentX);
+          const rectY = Math.min(startY, currentY);
+          const rectW = Math.abs(currentX - startX);
+          const rectH = Math.abs(currentY - startY);
+
+          // Draw translucent highlight
+          ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+          ctx.fillRect(rectX, rectY, rectW, rectH);
+
+          // Draw border
+          ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(rectX, rectY, rectW, rectH);
+
+          // Update hidden inputs
+          if (inputXSeg && inputYSeg && inputWSeg && inputHSeg) {
+            inputXSeg.value = Math.floor(rectX);
+            inputYSeg.value = Math.floor(rectY);
+            inputWSeg.value = Math.floor(rectW);
+            inputHSeg.value = Math.floor(rectH);
+          }
+        }
+
+        // Get mouse coordinates relative to canvas
+        function getMousePos(e) {
+          const rect = canvasSeg.getBoundingClientRect();
+          return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+          };
+        }
+
+        // Mouse event handlers
+        function handleMouseDown(e) {
+          if (e.button !== 0) return; // only left click
+
+          const pos = getMousePos(e);
+          startX = Math.max(0, Math.min(pos.x, canvasSeg.width));
+          startY = Math.max(0, Math.min(pos.y, canvasSeg.height));
+          currentX = startX;
+          currentY = startY;
+          isDrawing = true;
+
+          // Clear previous highlight
+          const ctx = canvasSeg.getContext('2d');
+          ctx.clearRect(0, 0, canvasSeg.width, canvasSeg.height);
+
+          e.preventDefault();
+        }
+
+        function handleMouseMove(e) {
+          if (!isDrawing) return;
+
+          const pos = getMousePos(e);
+          currentX = Math.max(0, Math.min(pos.x, canvasSeg.width));
+          currentY = Math.max(0, Math.min(pos.y, canvasSeg.height));
+
+          drawHighlight();
+          e.preventDefault();
+        }
+
+        function handleMouseUp(e) {
+          if (e.button !== 0 || !isDrawing) return;
+
+          isDrawing = false;
+          drawHighlight();
+          e.preventDefault();
+        }
+
+        // Initialize segmentation canvas
+        function initSeg() {
+          resizeCanvasToImageSeg();
+
+          // Add event listeners
+          canvasSeg.addEventListener('mousedown', handleMouseDown);
+          canvasSeg.addEventListener('mousemove', handleMouseMove);
+          canvasSeg.addEventListener('mouseup', handleMouseUp);
+
+          // Prevent context menu on right click
+          canvasSeg.addEventListener('contextmenu', e => e.preventDefault());
+
+          // Keep canvas aligned on window resize
+          window.addEventListener('resize', resizeCanvasToImageSeg);
+        }
+
+        if (imgSeg.complete && imgSeg.naturalWidth !== 0) {
+          initSeg();
+        } else {
+          imgSeg.addEventListener('load', initSeg);
         }
 
         })();

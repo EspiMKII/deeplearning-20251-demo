@@ -11,16 +11,19 @@ def input():
 
     if request.method == 'POST':
             form_id = request.form.get("form_id")
-            if form_id == "inpainting":
+            if form_id in ("about", "demo"):
+                return formIdHandler(form_id)
+            else:
                 session["topX"] = request.form.get("topX")
                 session["topY"] = request.form.get("topY")
                 session["width"] = request.form.get("width")
                 session["height"] = request.form.get("height")
-                return redirect(url_for("inpainting.inpainting"))
-            elif form_id in ("about", "demo"):
-                return formIdHandler(form_id)
-            else: #segmentation + inpainting
-                pass
+                if form_id == "inpainting":
+                    return redirect(url_for("inpainting.inpainting"))
+                else: #segmentation
+                    session["segModelType"] = request.form.get("segModelType")
+                    return redirect(url_for("segmentation.segmentation"))
+
 
     url = getRandomUrl(samesize=True)
     print(f"Fetching image from {url}")

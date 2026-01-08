@@ -45,7 +45,6 @@ def getRandomUrl(samesize=True):
         samesize (bool): guarantees the image from the url is of same width and height
     '''
     if samesize:
-        print(f"If this function sees the url file, it will obviously know it is as {samesize_urllist_path}")
         urllist = openUrlList(samesize_urllist_path)
     else:
         urllist = openUrlList(urllist_path)

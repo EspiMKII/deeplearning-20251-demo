@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='segmentation.css') }}">
+{% endblock %}
+
+{% block title %}
+    {% block demo %}Results{% endblock %}
+{% endblock %}
+
+{% block content %}
+    <div class="resultsText">
+        <p id="resultsText">Results</p>
+    </div>
+
+    <div class="images">
+        <div class="original">
+            <button type="button" class="original">Original</button>
+            <img class="original" id="original" src="{{ url_for('assets', filename='original.jpg') }}" alt="original">
+        </div>
+
+        <div class="seg_result">
+            <button type="button" class="seg_result">Segmentation Result</button>
+            <img class="original" id="original" src="{{ url_for('assets', filename='seg_result.jpg') }}" alt="segmentation result">
+        </div>
+    </div>
+
+    <div class="again">
+      <form id="again" method="post">
+        <input type="hidden" name="form_id" value="again">
+        <button type="submit">Again?</button>
+      </form>
+    </div>
+{% endblock %}
