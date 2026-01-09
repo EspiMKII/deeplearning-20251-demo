@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}About{% endblock %}
+{% block demo %}Input{% endblock %}
+
+
+{% block head%}
+    <link rel="stylesheet" href="{{ url_for("static", filename="about.css") }}"
+{% endblock%}
+
+{% block content %}
+    <div id="aboutText">
+        Project goals<br>
+        This application provides an interactive web interface for testing two deep learning models:<br>
+        <br>
+        Image Segmentation: based on a user-defined highlight on an image, identify objects within that highlight.<br>
+        Image Inpainting: after the user defines a mask on the image, fill in the masked region of the image.<br>
+        <br><br>
+        Team contributions<br>
+        Model & Development: Nguyễn Bảo Châu, Trần Hàn Đức Khải, Nguyễn Hải Dương<br>
+        Report Writing: Tăng Minh Ngọc<br>
+        Web Application Demo: Nguyễn Lê Hoàng<br>
+        <br><br>
+        Tech Stack:<br>
+        Model Framework: PyTorch, PyTorch Lightning, various CV libraries (OpenCV & Albumentations)<br>
+        Backend: Flask<br>
+        Frontend: HTML/CSS/JavaScript<br>
+        Deployment: Docker<br>
+    </div>
+
+{% endblock %}
