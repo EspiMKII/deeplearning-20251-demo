@@ -7,5 +7,6 @@ app/assets/original.jpg
 app/assets/output.jpg
 app/assets/seg_result.jpg
 app/assets/seg_models/
+app/assets/Archive.tar.gz
 
 app/src/__pycache__/
