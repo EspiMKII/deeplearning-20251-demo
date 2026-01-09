@@ -105,8 +105,7 @@
               panelInpaint.setAttribute('aria-hidden', 'true');
               panelSeg.hidden = false;
               panelSeg.setAttribute('aria-hidden', 'false');
-            } else {
-              // none selected
+            } else { // none selected
               panelInpaint.hidden = true;
               panelInpaint.setAttribute('aria-hidden', 'true');
               panelSeg.hidden = true;
@@ -126,7 +125,6 @@
         const img = document.getElementById('baseImageInpainting');
         if (!img) return;
 
-        // Build an overlay canvas inside the same wrapper as the image
         const wrapper = img.parentElement;
         wrapper.style.position = wrapper.style.position || 'relative';
         const canvas = document.createElement('canvas');
@@ -134,22 +132,18 @@
         canvas.style.position = 'absolute';
         canvas.style.left = '0';
         canvas.style.top = '0';
-        canvas.style.pointerEvents = 'none'; // so user can click inputs underneath
+        canvas.style.pointerEvents = 'none';
         wrapper.appendChild(canvas);
 
-        // Get references to inputs
         const inputX = document.getElementById('topX');
         const inputY = document.getElementById('topY');
         const inputW = document.getElementById('width');
         const inputH = document.getElementById('height');
 
-        // Resize the canvas to match the displayed image size
         function resizeCanvasToImage() {
-          // Use the displayed size so the user-entered coords map to displayed pixels
           const displayW = img.clientWidth;
           const displayH = img.clientHeight;
 
-          // Set canvas drawing buffer and CSS size to match displayed image
           canvas.width = displayW;
           canvas.height = displayH;
           canvas.style.width = displayW + 'px';
@@ -162,38 +156,31 @@
           canvas.style.left = (imgRect.left - wrapperRect.left) + 'px';
           canvas.style.top = (imgRect.top - wrapperRect.top) + 'px';
 
-          // Redraw after resize
           drawMask();
         }
 
-        // Draw the mask rectangle based on current input values
         function drawMask() {
           const ctx = canvas.getContext('2d');
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-          // Parse numbers; if invalid, do nothing
           const x = Number(inputX.value);
           const y = Number(inputY.value);
           const w = Number(inputW.value);
           const h = Number(inputH.value);
-
           if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(w) || !Number.isFinite(h)) {
             return;
           }
 
-          // convert to integers
           const xi = Math.max(0, Math.floor(x));
           const yi = Math.max(0, Math.floor(y));
           let wi = Math.max(0, Math.floor(w));
           let hi = Math.max(0, Math.floor(h));
-
           // clamp to canvas bounds
           if (xi >= canvas.width || yi >= canvas.height) return; // fully outside
           if (xi + wi > canvas.width) wi = canvas.width - xi;
           if (yi + hi > canvas.height) hi = canvas.height - yi;
           if (wi <= 0 || hi <= 0) return;
 
-          // draw
           ctx.fillStyle = 'rgba(0, 0, 0, 1)';
           ctx.fillRect(xi, yi, wi, hi);
         }
@@ -206,9 +193,7 @@
           [inputX, inputY, inputW, inputH].forEach(el => {
             if (!el) return;
             el.addEventListener('input', () => {
-              // basic client-side validation: keep numbers non-negative integers
               if (el.value === '') return drawMask();
-              // coerce to integer in the input display (optional)
               const n = Math.floor(Number(el.value));
               if (!Number.isFinite(n)) return;
               // don't overwrite while user types — only clamp visually here
@@ -216,12 +201,11 @@
             });
           });
 
-          // keep canvas aligned on window resize (or if image layout changes)
+          // keep canvas aligned on window resize
           window.addEventListener('resize', resizeCanvasToImage);
         }
 
-        if (img.complete && img.naturalWidth !== 0) {
-          // image already loaded
+        if (img.complete && img.naturalWidth !== 0) { // image already loaded
           init();
         } else {
           img.addEventListener('load', init);
@@ -232,7 +216,6 @@
         const imgSeg = document.getElementById('baseImageSeg');
         if (!imgSeg) return;
 
-        // Build an overlay canvas inside the same wrapper as the image
         const wrapperSeg = imgSeg.parentElement;
         wrapperSeg.style.position = wrapperSeg.style.position || 'relative';
         const canvasSeg = document.createElement('canvas');
@@ -243,7 +226,6 @@
         canvasSeg.style.cursor = 'crosshair';
         wrapperSeg.appendChild(canvasSeg);
 
-        // Get references to hidden inputs in the seg inpaint form
         const segForm = document.getElementById('segForm');
         const inputXSeg = segForm.querySelector('#topX');
         const inputYSeg = segForm.querySelector('#topY');
@@ -256,7 +238,6 @@
         let currentX = 0;
         let currentY = 0;
 
-        // Resize the canvas to match the displayed image size
         function resizeCanvasToImageSeg() {
           const displayW = imgSeg.clientWidth;
           const displayH = imgSeg.clientHeight;
@@ -276,7 +257,6 @@
           drawHighlight();
         }
 
-        // Draw the highlight rectangle
         function drawHighlight() {
           const ctx = canvasSeg.getContext('2d');
           ctx.clearRect(0, 0, canvasSeg.width, canvasSeg.height);
@@ -290,16 +270,13 @@
           const rectW = Math.abs(currentX - startX);
           const rectH = Math.abs(currentY - startY);
 
-          // Draw translucent highlight
           ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
           ctx.fillRect(rectX, rectY, rectW, rectH);
 
-          // Draw border
           ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)';
           ctx.lineWidth = 2;
           ctx.strokeRect(rectX, rectY, rectW, rectH);
 
-          // Update hidden inputs
           if (inputXSeg && inputYSeg && inputWSeg && inputHSeg) {
             inputXSeg.value = Math.floor(rectX);
             inputYSeg.value = Math.floor(rectY);
@@ -308,7 +285,6 @@
           }
         }
 
-        // Get mouse coordinates relative to canvas
         function getMousePos(e) {
           const rect = canvasSeg.getBoundingClientRect();
           return {
@@ -354,16 +330,13 @@
           e.preventDefault();
         }
 
-        // Initialize segmentation canvas
         function initSeg() {
           resizeCanvasToImageSeg();
 
-          // Add event listeners
           canvasSeg.addEventListener('mousedown', handleMouseDown);
           canvasSeg.addEventListener('mousemove', handleMouseMove);
           canvasSeg.addEventListener('mouseup', handleMouseUp);
 
-          // Prevent context menu on right click
           canvasSeg.addEventListener('contextmenu', e => e.preventDefault());
 
           // Keep canvas aligned on window resize
