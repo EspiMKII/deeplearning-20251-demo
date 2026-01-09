@@ -76,3 +76,16 @@ Then, go to your local browser and connect to the domain `localhost:5000`
 ## Usage
 The webpage's content should be pretty self explanatory. Give it a try!
 ## About
+### Project goals
+This application provides an interactive web interface for testing two deep learning models:
+- **Image Segmentation**: based on a user-defined highlight on an image, identify objects within that highlight.
+- **Image Inpainting**: after the user defines a mask on the image, fill in the masked region of the image.
+### Team contributions
+- **Model & Development**: Nguyễn Bảo Châu, Trần Hàn Đức Khải, Nguyễn Hải Dương, Tăng Minh Ngọc, Nguye
+- **Report Writing**: Tăng Minh Ngọc
+- **Web Application Demo**: Nguyễn Lê Hoàng
+### Tech Stack:
+- **Model Framework**: PyTorch, PyTorch Lightning, various CV libraries (OpenCV & Albumentations)
+- **Backend**: Flask
+- **Frontend**: HTML/CSS/JavaScript
+- **Deployment**: Docker
