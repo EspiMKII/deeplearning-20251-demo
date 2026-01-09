@@ -20,10 +20,22 @@ deeplearning-20251-demo/
 └── requirements.txt
 ```
 ## Prerequisites
-- Docker
-- Python w/ the various libraries in requirements.txt (preferrably, we set up a virtual environment for this)
+- Docker (if running with docker)
+- Python w/ the various libraries in requirements.txt (if running locally; and preferrably, we use a Python virtual environment)
 ## Installation & Setup
 ### With Docker
+__Pull image (warning: big)__:
+```bash
+docker pull espimkii/deeplearning-20251-demo:2.0
+```
+__Create a container from the image__:
+```bash
+docker run \
+    --name deeplearning-demo \
+    -p 5000:5000 \
+    --restart unless-stopped \
+    espimkii/deeplearning-20251-demo:2.0
+```
 
 ### Running Locally
 __Clone this repository:__
