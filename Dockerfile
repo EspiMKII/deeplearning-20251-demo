@@ -2,7 +2,8 @@ FROM python:3.13.11-slim
 WORKDIR /work
 
 RUN apt-get update && apt-get upgrade
-RUN apt-get install -y --no-install-recommends build-essential
+# these libraries are here because apparently openCV is just cringe
+RUN apt-get install -y --no-install-recommends build-essential ffmpeg libsm6 libxext6
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

@@ -34,7 +34,7 @@ docker run \
     --name deeplearning-demo \
     -p 5000:5000 \
     --restart unless-stopped \
-    espimkii/deeplearning-20251-demo:2.0
+    espimkii/deeplearning-20251-demo
 ```
 
 ### Running Locally
@@ -74,5 +74,5 @@ python3 app/src/base.py
 ```
 Then, go to your local browser and connect to the domain `localhost:5000`
 ## Usage
-
+The webpage's content should be pretty self explanatory. Give it a try!
 ## About
